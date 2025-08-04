@@ -9,5 +9,5 @@ namespace Domain.Repositories.Read;
 
 public interface IStudyRepository : IRepository<Study>, ISearchableRepository<Study>
 {
-    Task<Result<List<GetAllStudies>>> GetAllStudies(GetStudiesModel data, int idUnidade);
+    Task<Result<List<GetAllStudies>>> GetAllStudies(GetStudiesModel input, int idUnidade);
 }
