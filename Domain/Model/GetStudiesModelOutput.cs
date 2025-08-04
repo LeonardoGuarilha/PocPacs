@@ -1,11 +1,9 @@
-using Domain.Entities.Study;
-using Shared.Core.Messaging;
+using System;
 
-namespace Domain.Queries;
+namespace Domain.Model;
 
-public class GetAllStudies : IQuery
+public class GetStudiesModelOutput
 {
-    public int? IdUnidade { get; set; }
     public string? StudyUid { get; set; }
     public string? AcNumber { get; set; }
     public string? PatientId { get; set; }
@@ -19,10 +17,8 @@ public class GetAllStudies : IQuery
     public string? PatientSex { get; set; }
     public string? PatientBirth { get; set; }
 
-    public GetAllStudies(int idUnidade, string? studyUid, string? acNumber, string? patientId, string? patientName, string? studyDate,
-        string? studyDescription, string? modality, string? series, string? status, string? messages, string? patientSex, string? patientBirth)
+    public GetStudiesModelOutput(string? studyUid, string? acNumber, string? patientId, string? patientName, string? studyDate, string? studyDescription, string? modality, string? series, string? status, string? messages, string? patientSex, string? patientBirth)
     {
-        IdUnidade = idUnidade;
         StudyUid = studyUid;
         AcNumber = acNumber;
         PatientId = patientId;
@@ -36,11 +32,4 @@ public class GetAllStudies : IQuery
         PatientSex = patientSex;
         PatientBirth = patientBirth;
     }
-
-
-
-    public static GetAllStudies FromStudies(Study study)
-        => new(study.IdUnidade, study.StudyUid.StudyUid, study.AcNumber, study.PatientId, study.PatientName, study.StudyDate, study.StudyDescription,
-            study.Modality, study.Series, study.Status, study.Messages, study.PatientSex, study.PatientBirth);
 }
-

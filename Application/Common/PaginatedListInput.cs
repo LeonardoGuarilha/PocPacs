@@ -1,9 +1,10 @@
 using System;
 using Domain.SearchableRepository;
+using Flunt.Notifications;
 
 namespace Application.Common;
 
-public class PaginatedListInput
+public class PaginatedListInput : Notifiable
 {
     public int Page { get; set; }
     public int PerPage { get; set; }

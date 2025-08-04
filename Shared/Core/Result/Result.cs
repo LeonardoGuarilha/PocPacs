@@ -1,37 +1,59 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Shared.Core.Result;
 
-public class Result<TValue>
+public class Result
 {
-    private readonly TValue? _value;
-    private readonly Error _error;
-
-    public readonly bool IsSuccess;
-
-    public Result(TValue value)
+    protected Result(bool isSuccess, Error error)
     {
-        IsSuccess = true;
-        _value = value;
-        _error = Error.None;
+        switch (isSuccess)
+        {
+            case true when error != Error.None:
+                throw new InvalidOperationException();
+
+            case false when error == Error.None:
+                throw new InvalidOperationException();
+
+            default:
+                IsSuccess = isSuccess;
+                Error = error;
+                break;
+        }
     }
 
-    public Result(Error error)
+    public bool IsSuccess { get; }
+    public bool IsFailure => !IsSuccess;
+    public Error Error { get; }
+
+    public static Result Success() => new(true, Error.None);
+    public static Result Failure(Error error) => new(false, error);
+
+    public static Result<T> Success<T>(T value) => new(value, true, Error.None);
+    public static Result<T> Failure<T>(Error error) => new(default, false, error);
+
+    public static Result<T> Create<T>(T? value) =>
+        value is not null ? Success(value) : Failure<T>(Error.NullValue);
+}
+
+public class Result<T> : Result
+{
+    private readonly T? _value;
+    private readonly Error? _error;
+
+    protected internal Result(T? value, bool isSuccess, Error error) : base(isSuccess, error)
     {
-        IsSuccess = false;
-        _value = default;
+        _value = value;
         _error = error;
     }
 
-    public static Result<TValue> Success(TValue value) => new(value);
-    public static Result<TValue> Failure(Error error) => new(error);
+    [NotNull]
+    public T Value => _value! ?? throw new InvalidOperationException("Result has no value");
 
-    // Implicit operators
-    public static implicit operator Result<TValue>(TValue value) => new(value);
-    public static implicit operator Result<TValue>(Error error) => new(error);
-
+    public static implicit operator Result<T>(T? value) => Create(value);
 
     // Methods
     public TResult Match<TResult>(
-        Func<TValue, TResult> success,
+        Func<T, TResult> success,
         Func<Error, TResult> failure)
     {
         return IsSuccess ? success(_value!) : failure(_error);

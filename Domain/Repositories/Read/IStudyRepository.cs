@@ -1,4 +1,5 @@
 using Domain.Entities.Study;
+using Domain.Model;
 using Domain.Queries;
 using Domain.SearchableRepository;
 using Shared.Core.Data;
@@ -8,5 +9,5 @@ namespace Domain.Repositories.Read;
 
 public interface IStudyRepository : IRepository<Study>, ISearchableRepository<Study>
 {
-    Task<Result<IEnumerable<GetAllStudies>>> GetAllStudies();
+    Task<Result<List<GetAllStudies>>> GetAllStudies(GetStudiesModel data, int idUnidade);
 }
