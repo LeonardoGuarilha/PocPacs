@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using Npgsql;
+using Shared.Core.Configuration;
 
 namespace Infra.ConnectionContext;
 
@@ -8,7 +9,7 @@ public class ConnectionProvider : IConnectionProvider, IDisposable
 {
     public IDbConnection Connection { get; }
 
-    public IDbTransaction Transaction { get; }
+    public IDbTransaction Transaction { get; set; }
 
     public ConnectionProvider()
     {
@@ -25,7 +26,7 @@ public class ConnectionProvider : IConnectionProvider, IDisposable
 
     public IDbConnection CreateConnection()
     {
-        return new NpgsqlConnection("");
+        return new NpgsqlConnection(Configuration.Database.ConnectionString);
     }
 
     public void Dispose()

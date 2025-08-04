@@ -37,7 +37,7 @@ public class GetAllStudies : IQuery
         PatientBirth = patientBirth;
     }
 
-
+    public GetAllStudies() {}
 
     public static GetAllStudies FromStudies(Study study)
         => new(study.IdUnidade, study.StudyUid.StudyUid, study.AcNumber, study.PatientId, study.PatientName, study.StudyDate, study.StudyDescription,

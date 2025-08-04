@@ -13,9 +13,13 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Efferent.Native" Version="4.1.0" />
       <PackageReference Include="Flunt" Version="1.0.5" />
       <PackageReference Include="fo-dicom" Version="5.2.2" />
-      <PackageReference Include="MediatR" Version="12.2.0" />
+      <PackageReference Include="fo-dicom.Codecs" Version="5.14.2" />
+      <PackageReference Include="fo-dicom.Drawing" Version="4.0.8" />
+      <PackageReference Include="fo-dicom.NetCore" Version="4.0.8" />
+      <PackageReference Include="MediatR" Version="11.0.0" />
     </ItemGroup>
 
     <ItemGroup>

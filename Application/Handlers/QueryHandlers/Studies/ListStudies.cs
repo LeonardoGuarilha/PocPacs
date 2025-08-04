@@ -19,7 +19,7 @@ public class ListStudies : IListStudies
     {
         request.Validate();
 
-        var data = new GetStudiesModel(request.AcNumber, request.InitialDate, request.FinalDate, request.StudyDescription, request.PatientName,
+        var data = new GetStudiesModel(request.AcNumber, request.InitialDate, request.FinalDate, request.StudyDescription, request.PatientId,
             request.Modality, request.PatientBirthdate, request.PatientName);
 
         var studies = await _studyRepository.GetAllStudies(data, 1);

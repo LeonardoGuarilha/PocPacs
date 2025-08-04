@@ -1,4 +1,7 @@
-using FellowOakDicom;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting.WindowsServices;
 
 namespace Api;
 
@@ -6,37 +9,62 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        var isService = !(Debugger.IsAttached || args.Contains("--console"));
+        var builder = CreateWebHostBuilder(args.Where(arg => arg != "--console").ToArray());
 
-        // Add services to the container.
+        var enviroment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-        builder.Services.AddControllers();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
-
-        // fo-dicom
-        builder.Services.AddFellowOakDicom();
-
-        var app = builder.Build();
-
-        // fo-dicom
-        DicomSetupBuilder.UseServiceProvider(app.Services);
-
-        // Configure the HTTP request pipeline.
-        if (app.Environment.IsDevelopment())
+        if (enviroment.Equals("Production"))
         {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            builder = builder.UseUrls($"http://*:{GetPort(args)}");
         }
 
-        app.UseHttpsRedirection();
+        if (isService && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            var pathToExe = $"{Process.GetCurrentProcess().MainModule.FileName} --port={GetPort(args)}";
+            var pathToContentRoot = Path.GetDirectoryName(pathToExe);
+            builder.UseContentRoot(pathToContentRoot);
+        }
 
-        app.UseAuthorization();
+        try
+        {
+            var host = builder.Build();
 
+            if (isService && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                host.RunAsService();
+            }
+            else
+            {
+                host.Run();
 
-        app.MapControllers();
-
-        app.Run();
+            }
+        }
+        catch (Exception ex)
+        {
+            return;
+        }
     }
+    public static string GetPort(string[] args)
+    {
+        var portsArgs = args.Where(arg => arg.IndexOf("--port") >= 0);
+
+        if (portsArgs.Any())
+        {
+            var portArgs = portsArgs.First();
+
+            return portArgs.Substring(portArgs.IndexOf("--port=") + 7);
+        }
+
+        return "8043";
+    }
+    public static IConfiguration Configuration { get; } = new ConfigurationBuilder()
+                            .SetBasePath(Directory.GetCurrentDirectory())
+                            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                            .AddEnvironmentVariables()
+                            .Build();
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                    .UseStartup<Startup>();
 }
