@@ -10,11 +10,11 @@ using Shared.Core.Result;
 
 namespace Infra.Repositories.Postgres.Read;
 
-public class StudiesReadRepository : IStudyRepository
+public class QidoRSRepository : IQidoRSRepository
 {
     private readonly IConnectionProvider _connectionProvider;
 
-    public StudiesReadRepository(IConnectionProvider connectionProvider)
+    public QidoRSRepository(IConnectionProvider connectionProvider)
     {
         _connectionProvider = connectionProvider;
     }

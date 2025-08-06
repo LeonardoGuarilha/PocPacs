@@ -1,19 +1,18 @@
-using Application.Handlers.QueryHandlers.Studies;
+using Application.Handlers.QueryHandlers.Studies.ListStudies;
 using Domain.Model;
 using Domain.SearchableRepository;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class StudiesController : ControllerBase
+public class QidoRSController : ControllerBase
 {
     private readonly IMediator _mediator;
 
-    public StudiesController(IMediator mediator)
+    public QidoRSController(IMediator mediator)
     {
         _mediator = mediator;
     }

@@ -1,7 +1,7 @@
 using Application.Common;
 using Domain.Queries;
 
-namespace Application.Handlers.QueryHandlers.Studies;
+namespace Application.Handlers.QueryHandlers.Studies.ListStudies;
 
 public class ListStudiesOutput : PaginatedListOutput<GetAllStudies>
 {

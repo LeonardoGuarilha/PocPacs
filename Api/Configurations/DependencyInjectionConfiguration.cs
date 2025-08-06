@@ -1,4 +1,4 @@
-using Application.Handlers.QueryHandlers.Studies;
+using Application.Handlers.QueryHandlers.Studies.ListStudies;
 using Domain.Repositories.Read;
 using Infra.Repositories.Postgres.Read;
 using MediatR;
@@ -16,7 +16,7 @@ public static class DependencyInjectionConfiguration
     }
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        services.AddTransient<IStudyRepository, StudiesReadRepository>();
+        services.AddTransient<IQidoRSRepository, QidoRSRepository>();
 
         return services;
     }

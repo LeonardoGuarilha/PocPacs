@@ -4,15 +4,15 @@ using Domain.Repositories.Read;
 using Domain.SearchableRepository;
 using Shared.Core.Messaging;
 
-namespace Application.Handlers.QueryHandlers.Studies;
+namespace Application.Handlers.QueryHandlers.Studies.ListStudies;
 
 public class ListStudies : IListStudies
 {
-    private readonly IStudyRepository _studyRepository;
+    private readonly IQidoRSRepository _qidoRSRepository;
 
-    public ListStudies(IStudyRepository studyRepository)
+    public ListStudies(IQidoRSRepository qidoRSRepository)
     {
-        _studyRepository = studyRepository;
+        _qidoRSRepository = qidoRSRepository;
     }
 
     public async Task<CommandResult> Handle(ListStudiesInput request, CancellationToken cancellationToken)
@@ -22,7 +22,7 @@ public class ListStudies : IListStudies
         var data = new GetStudiesModel(request.AcNumber, request.InitialDate, request.FinalDate, request.StudyDescription, request.PatientId,
             request.Modality, request.PatientBirthdate, request.PatientName);
 
-        var studies = await _studyRepository.GetAllStudies(data, 1);
+        var studies = await _qidoRSRepository.GetAllStudies(data, 1);
 
         if (studies.IsSuccess)
         {
