@@ -7,7 +7,7 @@ using Shared.Core.Messaging;
 
 namespace Application.Handlers.QueryHandlers.Studies.ListStudies;
 
-public class ListStudiesInput : PaginatedListInput, IRequest<CommandResult>
+public class ListStudiesInput : PaginatedListInput, ICommand, IRequest<CommandResult>
 {
     public string? AcNumber { get; set; }
     public string? InitialDate { get; set; }

@@ -1,8 +1,8 @@
-using Shared.Core.DomainObjects;
+using System;
 
-namespace Domain.Entities.Image;
+namespace Domain.Queries;
 
-public class Image : EntityBase, IAggregateRoot
+public class GetImage
 {
     public string SopClassUID { get; set; }
     public string InstanceUID { get; set; }
@@ -15,11 +15,9 @@ public class Image : EntityBase, IAggregateRoot
     public string SeriesDescription { get; set; }
     public string TransferSyntaxUID { get; set; }
     public int PathType { get; set; }
-    public int IdPathName {  get; set; }
-
-    public Image(string sopClassUID, string instanceUID, int instranceNumber, string seriesUID, string imagePath,
-        int numberOfFrames, string modality, int seriesNumber, string seriesDescription, string transferSyntaxUID,
-        int pathType, int idPathName)
+    public int IdPathName { get; set; }
+    public GetImage(string sopClassUID, string instanceUID, int instranceNumber, string seriesUID, string imagePath, int numberOfFrames,
+        string modality, int seriesNumber, string seriesDescription, string transferSyntaxUID, int pathType, int idPathName)
     {
         SopClassUID = sopClassUID;
         InstanceUID = instanceUID;
@@ -34,5 +32,4 @@ public class Image : EntityBase, IAggregateRoot
         PathType = pathType;
         IdPathName = idPathName;
     }
-
 }

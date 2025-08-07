@@ -3,6 +3,7 @@ using Domain.Model;
 using Domain.SearchableRepository;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Core.Mediator;
 
 namespace Api.Controllers;
 
@@ -10,16 +11,16 @@ namespace Api.Controllers;
 [ApiController]
 public class QidoRSController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly IMediatorHandler _mediator;
 
-    public QidoRSController(IMediator mediator)
+    public QidoRSController(IMediatorHandler mediator)
     {
         _mediator = mediator;
     }
 
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status200OK)]
-    [HttpPost("GetStudies")]
+    [HttpPost("studies")]
     public async Task<IActionResult> GetStudies(
         CancellationToken cancellationToken,
         [FromBody] GetStudiesModel inputStudies,
@@ -67,7 +68,7 @@ public class QidoRSController : ControllerBase
         if (!String.IsNullOrWhiteSpace(sortField))
             input.Sort = sortField;
 
-        var output = await _mediator.Send(input, cancellationToken);
+        var output = await _mediator.SendCommand(input);
 
         if (!output.Success)
         {
