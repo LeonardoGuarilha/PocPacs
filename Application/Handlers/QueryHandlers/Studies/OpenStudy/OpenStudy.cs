@@ -45,16 +45,12 @@ public class OpenStudy : IOpenStudy
             }
         }
 
-        switch (request.ContentType)
+        return request.ContentType switch
         {
-            case MimeMediaTypes.Dicom:
-            // Retornar Dicom
-            case MimeMediaTypes.Jpg:
-            // Retornar Jpg
-            default:
-                // Retornar Dicom
-                return new EmptyResult();
-        }
+            MimeMediaTypes.Dicom => await GetDicom(request),
+            MimeMediaTypes.Jpg => await GetInstance(request),
+            _ => await GetInstance(request),
+        };
     }
 
     private async Task<IActionResult> GetInstance(OpenStudyInput request)
@@ -139,4 +135,16 @@ public class OpenStudy : IOpenStudy
 
         return image;
     }
+
+    private async Task<IActionResult> GetDicom(OpenStudyInput request)
+    {
+        var data = await _wadoRepository.RetrieveSopInstance(request.StudyInstanceUid, request.SeriesInstanceUid, request.SopInstanceUid, int.Parse(request.ClinicalTrialSiteID));
+        Stream file = File.OpenRead(data.Value.ImagePath);
+
+        return new FileStreamResult(file, MimeMediaTypes.Dicom)
+        {
+            EnableRangeProcessing = true
+        };
+    }
+
 }
