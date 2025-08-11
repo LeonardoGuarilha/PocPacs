@@ -1,6 +1,9 @@
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Text;
+using System.Text.Json;
 using Dicom;
 using Dicom.Imaging;
 using Dicom.Imaging.LUT;
@@ -32,7 +35,14 @@ public class OpenStudy : IOpenStudy
 
             if (data.IsSuccess)
             {
+                MemoryStream memoryStream = new MemoryStream(Encoding.Default.GetBytes(JsonSerializer.Serialize(data.Value)));
+                memoryStream.Flush();
+                memoryStream.Seek(0, SeekOrigin.Begin);
 
+                return new FileStreamResult(memoryStream, MimeMediaTypes.Json)
+                {
+                    EnableRangeProcessing = true
+                };
             }
         }
         else if (request.Thumbnail != null && request.Thumbnail.Value)
@@ -41,7 +51,26 @@ public class OpenStudy : IOpenStudy
 
             if (data.IsSuccess)
             {
+                var imageThumb = await LoadImage(request);
 
+                if (imageThumb.IsSuccess)
+                {
+                    Stream returnValue3 = new MemoryStream();
+
+                    using (var bmp = imageThumb.Value.RenderImage())
+                    {
+                        var rendered = bmp.AsClonedBitmap();
+                        Resize(rendered, 16, 16).Save(returnValue3, ImageFormat.Jpeg);
+                    }
+
+                    returnValue3.Flush();
+                    returnValue3.Seek(0, SeekOrigin.Begin);
+
+                    return new FileStreamResult(returnValue3, MimeMediaTypes.Jpg)
+                    {
+                        EnableRangeProcessing = true
+                    };
+                }
             }
         }
 
@@ -145,6 +174,65 @@ public class OpenStudy : IOpenStudy
         {
             EnableRangeProcessing = true
         };
+    }
+
+    private Bitmap Resize(Bitmap file, int w = 211, int h = 131, bool maintainSize = false)
+    {
+        if (maintainSize)
+        {
+            return ResizeImage(file, new Size((int)(file.Width * .5), (int)(file.Height * .5)));
+        }
+        else
+        {
+            var scale = Math.Min(w * 8f / file.Width, h * 8f / file.Height);
+            return ResizeImage(file, new Size((int)(file.Width * scale), (int)(file.Height * scale)));
+        }
+    }
+
+    public Bitmap ResizeImage(Image imgToResize, Size size)
+    {
+        var sourceWidth = imgToResize.Width;
+        var sourceHeight = imgToResize.Height;
+
+        var nPercentW = (size.Width / (float)sourceWidth);
+        var nPercentH = (size.Height / (float)sourceHeight);
+
+        var nPercent = nPercentH < nPercentW ? nPercentH : nPercentW;
+
+        var destWidth = (int)(sourceWidth * nPercent);
+        var destHeight = (int)(sourceHeight * nPercent);
+
+        var src = imgToResize;
+
+        using (var dst = new Bitmap(destWidth, destHeight, imgToResize.PixelFormat))
+        {
+
+            if (imgToResize.HorizontalResolution != 0 && imgToResize.VerticalResolution != 0)
+            {
+                dst.SetResolution(imgToResize.HorizontalResolution, imgToResize.VerticalResolution);
+            }
+            else
+            {
+                dst.SetResolution(destWidth * 100, destHeight * 100);
+            }
+
+            using (var g = Graphics.FromImage(dst))
+            {
+                g.CompositingQuality = CompositingQuality.HighSpeed;
+                g.InterpolationMode = InterpolationMode.Low;
+                g.SmoothingMode = SmoothingMode.HighSpeed;
+                g.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+                var format = ImageFormat.Jpeg;
+                g.DrawImage(src, 0, 0, dst.Width, dst.Height);
+
+                var m = new MemoryStream();
+                dst.Save(m, format);
+
+                var img = (Bitmap)Image.FromStream(m);
+
+                return img;
+            }
+        }
     }
 
 }
