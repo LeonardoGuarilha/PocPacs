@@ -17,7 +17,7 @@ public class WadoRepository : IWadoRepository
     }
 
 
-    public async Task<Result<List<GetMetadata>>> RetrieveMetadata(string studyUid, string seriesUid, string instanceUid, int idUnidade)
+    public async Task<Result<GetMetadata>> RetrieveMetadata(string? studyUid, string? seriesUid, string? instanceUid, int idUnidade)
     {
         StringBuilder stringBuilder = new StringBuilder();
         DynamicParameters dynamicParameters = new DynamicParameters();
@@ -72,18 +72,18 @@ public class WadoRepository : IWadoRepository
         {
             try
             {
-                var result = await connection.QueryAsync<GetMetadata>(stringBuilder.ToString(), dynamicParameters);
+                var result = await connection.QueryFirstOrDefaultAsync<GetMetadata>(stringBuilder.ToString(), dynamicParameters);
 
-                return Result.Success<List<GetMetadata>>(result.ToList());
+                return Result.Success<GetMetadata>(result);
             }
             catch (Exception ex)
             {
-                return Result.Failure<List<GetMetadata>>(Error.NullValue);
+                return Result.Failure<GetMetadata>(Error.NullValue);
             }
         }
     }
 
-    public async Task<Result<GetImage>> RetrieveSopInstance(string studyUid, string seriesUid, string instanceUid, int idUnidade)
+    public async Task<Result<GetImage>> RetrieveSopInstance(string? studyUid, string? seriesUid, string? instanceUid, int idUnidade)
     {
         StringBuilder stringBuilder = new StringBuilder();
         DynamicParameters dynamicParameters = new DynamicParameters();
