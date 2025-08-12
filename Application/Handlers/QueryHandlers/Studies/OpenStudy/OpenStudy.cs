@@ -21,33 +21,39 @@ public class OpenStudy : IOpenStudy
     private readonly IWadoRepository _wadoRepository;
 
     public OpenStudy(IWadoRepository wadoRepository)
-    {
+    {   ImageManager.SetImplementation(WinFormsImageManager.Instance);
+
         _wadoRepository = wadoRepository;
     }
 
     public async Task<IActionResult> Handle(OpenStudyInput request, CancellationToken cancellationToken)
     {
-        ImageManager.SetImplementation(WinFormsImageManager.Instance);
+        Dicom.Imaging.Codec.TranscoderManager.SetImplementation(new Efferent.Native.Codec.NativeTranscoderManager());
 
         if (request.Metadata)
         {
-            var data = await _wadoRepository.RetrieveMetadata(request.StudyInstanceUid, request.SeriesInstanceUid, request.SopInstanceUid, int.Parse(request.ClinicalTrialSiteID));
+            //var data = await _wadoRepository.RetrieveMetadata(request.StudyUid, request.SerieInstanceUid, request.InstanceUid, 1);
 
-            if (data.IsSuccess)
+            //if (data.IsSuccess)
+            //{
+            var data = new
             {
-                MemoryStream memoryStream = new MemoryStream(Encoding.Default.GetBytes(JsonSerializer.Serialize(data.Value)));
-                memoryStream.Flush();
-                memoryStream.Seek(0, SeekOrigin.Begin);
+                PatientName = "Teste",
+                PatientId = 1
+            };
+            MemoryStream memoryStream = new MemoryStream(Encoding.Default.GetBytes(JsonSerializer.Serialize(data)));
+            memoryStream.Flush();
+            memoryStream.Seek(0, SeekOrigin.Begin);
 
-                return new FileStreamResult(memoryStream, MimeMediaTypes.Json)
-                {
-                    EnableRangeProcessing = true
-                };
-            }
+            return new FileStreamResult(memoryStream, MimeMediaTypes.Json)
+            {
+                EnableRangeProcessing = true
+            };
+            //}
         }
-        else if (request.Thumbnail != null && request.Thumbnail.Value)
+        else if (request.Thumbnail != null && request.Thumbnail)
         {
-            var data = await _wadoRepository.RetrieveSopInstance(request.StudyInstanceUid, request.SeriesInstanceUid, request.SopInstanceUid, int.Parse(request.ClinicalTrialSiteID));
+            var data = await _wadoRepository.RetrieveSopInstance(request.StudyUid, request.SerieInstanceUid, request.InstanceUid, 1);
 
             if (data.IsSuccess)
             {
@@ -74,21 +80,22 @@ public class OpenStudy : IOpenStudy
             }
         }
 
-        return request.ContentType switch
-        {
-            MimeMediaTypes.Dicom => await GetDicom(request),
-            MimeMediaTypes.Jpg => await GetInstance(request),
-            _ => await GetInstance(request),
-        };
+        return await GetInstance(request);
+        // return request.ContentType switch
+        // {
+        //     MimeMediaTypes.Dicom => await GetDicom(request),
+        //     MimeMediaTypes.Jpg => await GetInstance(request),
+        //     _ => await GetInstance(request),
+        // };
     }
 
     private async Task<IActionResult> GetInstance(OpenStudyInput request)
     {
-        var imageFrame = request.FrameNumber ?? 0;
+        //var imageFrame = request.FrameNumber ?? 0;
         var image = await LoadImage(request);
 
         Stream resultValue = new MemoryStream();
-        using (var bmp = image.Value.RenderImage(imageFrame))
+        using (var bmp = image.Value.RenderImage(0))//imageFrame
         {
             var rendered = bmp.As<Bitmap>();
 
@@ -109,7 +116,7 @@ public class OpenStudy : IOpenStudy
         Stopwatch watch = new Stopwatch();
         watch.Start();
 
-        var data = await _wadoRepository.RetrieveSopInstance(request.StudyInstanceUid, request.SeriesInstanceUid, request.SopInstanceUid, int.Parse(request.ClinicalTrialSiteID));
+        var data = await _wadoRepository.RetrieveSopInstance(request.StudyUid, request.SerieInstanceUid, request.InstanceUid, 1);
 
         if (data.IsSuccess)
         {
@@ -119,10 +126,10 @@ public class OpenStudy : IOpenStudy
             watch.Restart();
 
             var image = new DicomImage(file.Dataset);
-            if (request.Lut.HasValue)
-            {
-                image = ApplyLut(data.Value.ImagePath, image, request.Lut ?? 0, file).Value;
-            }
+            // if (request.Lut.HasValue)
+            // {
+            //     image = ApplyLut(data.Value.ImagePath, image, -1, file).Value; //data.Value.ImagePath, image, request.Lut ?? 0, file
+            // }
 
             return Result.Success<DicomImage>(image);
         }
@@ -167,7 +174,7 @@ public class OpenStudy : IOpenStudy
 
     private async Task<IActionResult> GetDicom(OpenStudyInput request)
     {
-        var data = await _wadoRepository.RetrieveSopInstance(request.StudyInstanceUid, request.SeriesInstanceUid, request.SopInstanceUid, int.Parse(request.ClinicalTrialSiteID));
+        var data = await _wadoRepository.RetrieveSopInstance(request.StudyUid, request.SerieInstanceUid, request.InstanceUid, 1);
         Stream file = File.OpenRead(data.Value.ImagePath);
 
         return new FileStreamResult(file, MimeMediaTypes.Dicom)

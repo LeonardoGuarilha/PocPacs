@@ -17,6 +17,7 @@ public static class DependencyInjectionConfiguration
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
         services.AddTransient<IQidoRSRepository, QidoRSRepository>();
+        services.AddTransient<IWadoRepository, WadoRepository>();
 
         return services;
     }

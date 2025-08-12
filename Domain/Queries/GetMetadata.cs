@@ -4,31 +4,45 @@ namespace Domain.Queries;
 
 public class GetMetadata : IQuery
 {
-    public int? IdUnidade { get; set; }
-    public string? StudyUid { get; set; }
-    public string? AcNumber { get; set; }
-    public string? PatientId { get; set; }
-    public string? PatientName { get; set; }
-    public string? StudyDate { get; set; }
-    public string? StudyDescription { get; set; }
-    public string? Modality { get; set; }
-    public string? Series { get; set; }
-    public string? PatientSex { get; set; }
-    public string? PatientBirth { get; set; }
+    public string PathName { get; set; }
+    public int PathType { get; set; }
+    public string SerieDescription { get; set; }
+    public string StudyUid { get; set; }
+    public string SerieUid { get; set; }
+    public string InstanceUid { get; set; }
+    public string PatientName { get; set; }
+    public string PatientId { get; set; }
+    public string StudyDate { get; set; }
+    public string AccessionNumber { get; set; }
+    public string PatientBirth { get; set; }
+    public string Modality { get; set; }
+    public string SeriesTime { get; set; }
+    public string DiskClientId { get; set; }
+    public string DiskSecret { get; set; }
+    public string DiskBucket { get; set; }
+    public string DiskRegion { get; set; }
+    public string FullFileName { get; set; }
 
-    public GetMetadata(int? idUnidade, string? studyUid, string? acNumber, string? patientId, string? patientName, string? studyDate,
-         string? studyDescription, string? modality, string? series, string? patientSex, string? patientBirth)
+    public GetMetadata(string pathName, int pathType, string serieDescription, string studyUid, string serieUid, string instanceUid, string patientName, string patientId, string studyDate, string accessionNumber, string patientBirth, string modality, string seriesTime, string diskClientId, string diskSecret, string diskBucket, string diskRegion, string fullFileName)
     {
-        IdUnidade = idUnidade;
+        PathName = pathName;
+        PathType = pathType;
+        SerieDescription = serieDescription;
         StudyUid = studyUid;
-        AcNumber = acNumber;
-        PatientId = patientId;
+        SerieUid = serieUid;
+        InstanceUid = instanceUid;
         PatientName = patientName;
+        PatientId = patientId;
         StudyDate = studyDate;
-        StudyDescription = studyDescription;
-        Modality = modality;
-        Series = series;
-        PatientSex = patientSex;
+        AccessionNumber = accessionNumber;
         PatientBirth = patientBirth;
+        Modality = modality;
+        SeriesTime = seriesTime;
+        DiskClientId = diskClientId;
+        DiskSecret = diskSecret;
+        DiskBucket = diskBucket;
+        DiskRegion = diskRegion;
+        FullFileName = fullFileName;
     }
+
 }

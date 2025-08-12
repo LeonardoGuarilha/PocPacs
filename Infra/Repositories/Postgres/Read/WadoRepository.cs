@@ -76,7 +76,7 @@ public class WadoRepository : IWadoRepository
 
                 return Result.Success<List<GetMetadata>>(result.ToList());
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return Result.Failure<List<GetMetadata>>(Error.NullValue);
             }
