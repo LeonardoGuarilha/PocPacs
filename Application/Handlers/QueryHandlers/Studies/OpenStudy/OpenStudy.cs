@@ -30,7 +30,7 @@ public class OpenStudy : IOpenStudy
     {
         Dicom.Imaging.Codec.TranscoderManager.SetImplementation(new Efferent.Native.Codec.NativeTranscoderManager());
 
-        if (request.Metadata.HasValue)
+        if ((bool)request.Metadata)
         {
             var data = await _wadoRepository.RetrieveMetadata(request.StudyInstanceUid, request.SeriesInstanceUid, request.SopInstanceUid, int.Parse(request.ClinicalTrialSiteID!));
 
@@ -46,7 +46,7 @@ public class OpenStudy : IOpenStudy
                 };
             }
         }
-        else if (request.Thumbnail != null && request.Thumbnail.HasValue)
+        else if (request.Thumbnail != null && (bool)request.Thumbnail)
         {
             var data = await _wadoRepository.RetrieveSopInstance(request.StudyInstanceUid, request.SeriesInstanceUid, request.SopInstanceUid, int.Parse(request.ClinicalTrialSiteID!));
 
@@ -114,7 +114,7 @@ public class OpenStudy : IOpenStudy
 
         if (data.IsSuccess)
         {
-            var file = DicomFile.Open(data.Value.ImagePath);
+            var file = DicomFile.Open(data.Value.PathName);
 
             watch.Reset();
             watch.Restart();
@@ -122,7 +122,7 @@ public class OpenStudy : IOpenStudy
             var image = new DicomImage(file.Dataset);
             if (request.Lut.HasValue)
             {
-                image = ApplyLut(data.Value.ImagePath, image, request.Lut ?? 0, file).Value;
+                image = ApplyLut(data.Value.PathName, image, request.Lut ?? 0, file).Value;
             }
 
             return Result.Success<DicomImage>(image);
@@ -169,7 +169,7 @@ public class OpenStudy : IOpenStudy
     private async Task<IActionResult> GetDicom(OpenStudyInput request)
     {
         var data = await _wadoRepository.RetrieveSopInstance(request.StudyInstanceUid, request.SeriesInstanceUid, request.SopInstanceUid, int.Parse(request.ClinicalTrialSiteID!));
-        Stream file = File.OpenRead(data.Value.ImagePath);
+        Stream file = File.OpenRead(data.Value.PathName);
 
         return new FileStreamResult(file, MimeMediaTypes.Dicom)
         {

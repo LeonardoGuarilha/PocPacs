@@ -33,7 +33,6 @@ public class Startup
         var healthChecksBuilder = services.AddHealthChecks();
 
         healthChecksBuilder.AddNpgSql(Configuration.Database.ConnectionString);
-        healthChecksBuilder.AddNpgSql(connectionString: Configuration.Database.ConnectionString);
         //switch (Configuration.Database.Provider)
         //{
         //    case "postgres":

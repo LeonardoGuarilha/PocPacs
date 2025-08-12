@@ -23,7 +23,15 @@ public class GetMetadata : IQuery
     public string DiskRegion { get; set; }
     public string FullFileName { get; set; }
 
-    public GetMetadata(string pathName, int pathType, string serieDescription, string studyUid, string serieUid, string instanceUid, string patientName, string patientId, string studyDate, string accessionNumber, string patientBirth, string modality, string seriesTime, string diskClientId, string diskSecret, string diskBucket, string diskRegion, string fullFileName)
+    public GetMetadata()
+    {
+
+    }
+
+    public GetMetadata(string pathName, int pathType, string serieDescription, string studyUid, string serieUid, string instanceUid,
+        string patientName, string patientId, string studyDate, string accessionNumber, string patientBirth, string modality,
+        string seriesTime, string diskClientId, string diskSecret, string diskBucket, string diskRegion, string fullFileName
+    )
     {
         PathName = pathName;
         PathType = pathType;

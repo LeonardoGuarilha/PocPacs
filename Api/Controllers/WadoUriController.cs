@@ -23,7 +23,7 @@ public class WadoUriController : ControllerBase
     public async Task<IActionResult> GetImage([ModelBinder(typeof(UriRequest))] IWadoUriRequest request)
     {
         var input = new OpenStudyInput(request.StudyInstanceUid, request.AccessionNumber, request.PatientId, request.OrderId, request.ClinicalTrialSiteID,
-            request.SeriesInstanceUid, request.SopInstanceUid, request.Frame, request.RequestType, request.ContentType, request.Charset, request.Metadata.HasValue,
+            request.SeriesInstanceUid, request.SopInstanceUid, request.Frame, request.RequestType, request.ContentType, request.Charset, request.Metadata,
             request.Jwt, request.InstanceNumber, request.Lut, request.ImageRequestInfo.Rows, request.ImageRequestInfo.Columns, request.ImageRequestInfo.FrameNumber,
             request.ImageRequestInfo.ImageQuality, request.ImageRequestInfo.Thumbnail, request.ImageRequestInfo.Region, request.ImageRequestInfo.WindowCenter,
             request.ImageRequestInfo.WindowWidth, request.ImageRequestInfo.PresentationUid, request.ImageRequestInfo.PresentationSeriesUid, request.ImageRequestInfo.TransferSyntax,
