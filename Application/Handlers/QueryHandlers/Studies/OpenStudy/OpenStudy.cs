@@ -30,13 +30,13 @@ public class OpenStudy : IOpenStudy
     {
         Dicom.Imaging.Codec.TranscoderManager.SetImplementation(new Efferent.Native.Codec.NativeTranscoderManager());
 
-        if ((bool)request.Metadata)
+        if (request.Metadata != null && (bool)request.Metadata)
         {
             var data = await _wadoRepository.RetrieveMetadata(request.StudyInstanceUid, request.SeriesInstanceUid, request.SopInstanceUid, int.Parse(request.ClinicalTrialSiteID!));
 
             if (data.IsSuccess)
             {
-                MemoryStream memoryStream = new MemoryStream(Encoding.Default.GetBytes(JsonSerializer.Serialize(data)));
+                MemoryStream memoryStream = new MemoryStream(Encoding.Default.GetBytes(JsonSerializer.Serialize(data.Value)));
                 memoryStream.Flush();
                 memoryStream.Seek(0, SeekOrigin.Begin);
 
@@ -48,30 +48,25 @@ public class OpenStudy : IOpenStudy
         }
         else if (request.Thumbnail != null && (bool)request.Thumbnail)
         {
-            var data = await _wadoRepository.RetrieveSopInstance(request.StudyInstanceUid, request.SeriesInstanceUid, request.SopInstanceUid, int.Parse(request.ClinicalTrialSiteID!));
+            var imageThumb = await LoadImage(request);
 
-            if (data.IsSuccess)
+            if (imageThumb.IsSuccess)
             {
-                var imageThumb = await LoadImage(request);
+                Stream returnValue3 = new MemoryStream();
 
-                if (imageThumb.IsSuccess)
+                using (var bmp = imageThumb.Value.RenderImage())
                 {
-                    Stream returnValue3 = new MemoryStream();
-
-                    using (var bmp = imageThumb.Value.RenderImage())
-                    {
-                        var rendered = bmp.AsClonedBitmap();
-                        Resize(rendered, 16, 16).Save(returnValue3, ImageFormat.Jpeg);
-                    }
-
-                    returnValue3.Flush();
-                    returnValue3.Seek(0, SeekOrigin.Begin);
-
-                    return new FileStreamResult(returnValue3, MimeMediaTypes.Jpg)
-                    {
-                        EnableRangeProcessing = true
-                    };
+                    var rendered = bmp.AsClonedBitmap();
+                    Resize(rendered, 16, 16).Save(returnValue3, ImageFormat.Jpeg);
                 }
+
+                returnValue3.Flush();
+                returnValue3.Seek(0, SeekOrigin.Begin);
+
+                return new FileStreamResult(returnValue3, MimeMediaTypes.Jpg)
+                {
+                    EnableRangeProcessing = true
+                };
             }
         }
 
