@@ -1,13 +1,12 @@
 using Application.Handlers.QueryHandlers.Studies.ListStudies;
 using Domain.Model;
 using Domain.SearchableRepository;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Core.Mediator;
 
 namespace Api.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/qidors")]
 [ApiController]
 public class QidoRSController : ControllerBase
 {

@@ -40,7 +40,7 @@ public class GetAllStudies : IQuery
     public GetAllStudies() {}
 
     public static GetAllStudies FromStudies(Study study)
-        => new(study.IdUnidade, study.StudyUid.StudyUid, study.AcNumber, study.PatientId, study.PatientName, study.StudyDate, study.StudyDescription,
-            study.Modality, study.Series, study.Status, study.Messages, study.PatientSex, study.PatientBirth);
+        => new(study.IdUnidade, study.StudyUid.StudyUid, study.AccessionNumber, study.PatientId, study.PatientName, study.StudyDate.ToString(), study.StudyDescription,
+            study.Modality, study.Series, study.Status, study.Messages, study.PatientSex, study.PatientBirthDate);
 }
 

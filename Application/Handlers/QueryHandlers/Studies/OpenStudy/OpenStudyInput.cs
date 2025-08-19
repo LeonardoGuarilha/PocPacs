@@ -92,4 +92,9 @@ public class OpenStudyInput : IRequest<IActionResult>
         X = x;
         Y = y;
     }
+
+    public void Validate()
+    {
+        throw new NotImplementedException();
+    }
 }

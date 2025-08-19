@@ -132,30 +132,29 @@ public class OpenStudy : IOpenStudy
         var dataset = dicomFile.Dataset;
         image = new DicomImage(dataset);
 
-        if (lut == 0)
+        switch (lut)
         {
-            dicomFile.Dataset.AddOrUpdate(DicomTag.VOILUTFunction, LUT_LINEAR);
-            image = new DicomImage(dicomFile.Dataset);
-            var opts = GrayscaleRenderOptions.FromDataset(dicomFile.Dataset);
-            var linearLut = VOILUT.Create(opts);
-            linearLut.Recalculate();
-        }
-        else if (lut == 1)
-        {
-            dicomFile.Dataset.AddOrUpdate(DicomTag.VOILUTFunction, LUT_SIGMOID);
-            image = new DicomImage(dicomFile.Dataset);
-            var opts = GrayscaleRenderOptions.FromDataset(dicomFile.Dataset);
-            var lutSigmoid = VOILUT.Create(opts);
-            lutSigmoid.Recalculate();
-
-        }
-        else if (lut == 2)
-        {
-            dicomFile.Dataset.AddOrUpdate(DicomTag.VOILUTFunction, LUT_LINEAR_EXACT);
-            image = new DicomImage(dicomFile.Dataset);
-            var opts = GrayscaleRenderOptions.FromDataset(dicomFile.Dataset);
-            var lutLinearExact = VOILUT.Create(opts);
-            lutLinearExact.Recalculate();
+            case 0:
+                dicomFile.Dataset.AddOrUpdate(DicomTag.VOILUTFunction, LUT_LINEAR);
+                image = new DicomImage(dicomFile.Dataset);
+                var opts = GrayscaleRenderOptions.FromDataset(dicomFile.Dataset);
+                var linearLut = VOILUT.Create(opts);
+                linearLut.Recalculate();
+                break;
+            case 1:
+                dicomFile.Dataset.AddOrUpdate(DicomTag.VOILUTFunction, LUT_SIGMOID);
+                image = new DicomImage(dicomFile.Dataset);
+                var opts2 = GrayscaleRenderOptions.FromDataset(dicomFile.Dataset);
+                var lutSigmoid = VOILUT.Create(opts2);
+                lutSigmoid.Recalculate();
+                break;
+            case 2:
+                dicomFile.Dataset.AddOrUpdate(DicomTag.VOILUTFunction, LUT_LINEAR_EXACT);
+                image = new DicomImage(dicomFile.Dataset);
+                var opts3 = GrayscaleRenderOptions.FromDataset(dicomFile.Dataset);
+                var lutLinearExact = VOILUT.Create(opts3);
+                lutLinearExact.Recalculate();
+                break;
         }
 
         return image;
