@@ -20,7 +20,7 @@ public class DicomWebHandler : IDicomWebHandler
 
     public IActionResult RetrieveStudies(List<DicomField> request)
     {
-        var dataset = DicomWebRepostiroy.FindStudy(request).ToDataset();
+        var dataset = DicomWebRepostiroy.FindStudy(request).Value.ToDataset();
 
         return new OkObjectResult(dataset);
     }
@@ -32,7 +32,7 @@ public class DicomWebHandler : IDicomWebHandler
             new DicomField("StudyInstanceUID", studyInstanceUID),
         });
 
-        var dataset = DicomWebRepostiroy.FindSeries(request).ToDataset();
+        var dataset = DicomWebRepostiroy.FindSeries(request).Value.ToDataset();
 
         return new OkObjectResult(dataset);
 
@@ -46,7 +46,7 @@ public class DicomWebHandler : IDicomWebHandler
             new DicomField("SeriesInstanceUID", seriesInstanceUID)
         };
 
-        var fullFileName = DicomWebRepostiroy.FindInstancesThumb(parameters).FirstOrDefault().FullFilename;
+        var fullFileName = DicomWebRepostiroy.FindInstancesThumb(parameters).Value.FirstOrDefault().FullFilename;
 
         var dicomFile = DicomFile.Open(fullFileName);
         var dicomImage = new DicomImage(dicomFile.Dataset);
@@ -70,7 +70,7 @@ public class DicomWebHandler : IDicomWebHandler
             new DicomField("SeriesInstanceUID", seriesInstanceUID),
         });
 
-        var dataset = DicomWebRepostiroy.FindInstances(request).ToDataset();
+        var dataset = DicomWebRepostiroy.FindInstances(request).Value.ToDataset();
 
         return new OkObjectResult(dataset);
     }
@@ -82,6 +82,6 @@ public class DicomWebHandler : IDicomWebHandler
 
     public List<Image> FindInstances(List<DicomField> dataset)
     {
-        return DicomWebRepostiroy.FindInstances(dataset);
+        return DicomWebRepostiroy.FindInstances(dataset).Value;
     }
 }
