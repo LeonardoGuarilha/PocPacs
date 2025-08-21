@@ -1,4 +1,3 @@
-using System;
 using Domain.Dicom;
 using Domain.Entities.Image;
 using Domain.Entities.Series;

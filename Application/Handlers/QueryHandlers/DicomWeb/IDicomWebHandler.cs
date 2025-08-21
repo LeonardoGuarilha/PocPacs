@@ -2,6 +2,7 @@ using System;
 using Domain.Dicom;
 using Domain.Entities.Image;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Core.Result;
 
 namespace Application.Handlers.QueryHandlers.DicomWeb;
 
@@ -12,5 +13,5 @@ public interface IDicomWebHandler
     IActionResult GetSeriesThumbnail(string studyInstanceUID, string seriesInstanceUID);
     IActionResult RetrieveInstances(List<DicomField> request, string studyInstanceUID, string seriesInstanceUID);
     MemoryStream GetInstanceStream(Image instance, string studyInstanceUID, string seriesInstanceUID);
-    List<Image> FindInstances(List<DicomField> dataset);
+    Result<Image> FindInstance(List<DicomField> dataset);
 }

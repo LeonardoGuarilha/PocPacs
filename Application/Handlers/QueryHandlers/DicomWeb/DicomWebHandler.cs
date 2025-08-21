@@ -6,6 +6,7 @@ using Domain.Dicom;
 using Domain.Entities.Image;
 using Domain.Repositories.Read;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Core.Result;
 
 namespace Application.Handlers.QueryHandlers.DicomWeb;
 
@@ -20,9 +21,14 @@ public class DicomWebHandler : IDicomWebHandler
 
     public IActionResult RetrieveStudies(List<DicomField> request)
     {
-        var dataset = DicomWebRepostiroy.FindStudy(request).Value.ToDataset();
+        var dataset = DicomWebRepostiroy.FindStudy(request);//.Value.ToDataset();
 
-        return new OkObjectResult(dataset);
+        if (dataset.IsSuccess)
+        {
+            return new OkObjectResult(dataset.Value.ToDataset());
+        }
+
+        return new BadRequestObjectResult(Error.NoData);
     }
 
     public IActionResult RetrieveSeries(List<DicomField> request, string studyInstanceUID)
@@ -32,10 +38,14 @@ public class DicomWebHandler : IDicomWebHandler
             new DicomField("StudyInstanceUID", studyInstanceUID),
         });
 
-        var dataset = DicomWebRepostiroy.FindSeries(request).Value.ToDataset();
+        var dataset = DicomWebRepostiroy.FindSeries(request);//.Value.ToDataset();
 
-        return new OkObjectResult(dataset);
+        if (dataset.IsSuccess)
+        {
+            return new OkObjectResult(dataset.Value.ToDataset());
+        }
 
+        return new BadRequestObjectResult(Error.NoData);
     }
 
     public IActionResult GetSeriesThumbnail(string studyInstanceUID, string seriesInstanceUID)
@@ -46,20 +56,27 @@ public class DicomWebHandler : IDicomWebHandler
             new DicomField("SeriesInstanceUID", seriesInstanceUID)
         };
 
-        var fullFileName = DicomWebRepostiroy.FindInstancesThumb(parameters).Value.FirstOrDefault().FullFilename;
+        var dataset = DicomWebRepostiroy.FindInstancesThumb(parameters);//.Value.FirstOrDefault().FullFilename;
 
-        var dicomFile = DicomFile.Open(fullFileName);
-        var dicomImage = new DicomImage(dicomFile.Dataset);
-
-        using MemoryStream ms = new MemoryStream();
-        dicomImage.RenderImage().As<System.Drawing.Bitmap>().Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-        ms.Flush();
-        ms.Seek(0, SeekOrigin.Begin);
-
-        return new FileStreamResult(ms, MimeMediaTypes.Jpg)
+        if (dataset.IsSuccess)
         {
-            EnableRangeProcessing = true,
-        };
+            var fullFileName = dataset.Value.FirstOrDefault()!.FullFilename;
+
+            var dicomFile = DicomFile.Open(fullFileName);
+            var dicomImage = new DicomImage(dicomFile.Dataset);
+
+            using MemoryStream ms = new MemoryStream();
+            dicomImage.RenderImage().As<System.Drawing.Bitmap>().Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+            ms.Flush();
+            ms.Seek(0, SeekOrigin.Begin);
+
+            return new FileStreamResult(ms, MimeMediaTypes.Jpg)
+            {
+                EnableRangeProcessing = true,
+            };
+        }
+
+        return new BadRequestObjectResult(Error.NoData);
     }
 
     public IActionResult RetrieveInstances(List<DicomField> request, string studyInstanceUID, string seriesInstanceUID)
@@ -70,9 +87,14 @@ public class DicomWebHandler : IDicomWebHandler
             new DicomField("SeriesInstanceUID", seriesInstanceUID),
         });
 
-        var dataset = DicomWebRepostiroy.FindInstances(request).Value.ToDataset();
+        var dataset = DicomWebRepostiroy.FindInstances(request);//.Value.ToDataset();
 
-        return new OkObjectResult(dataset);
+        if (dataset.IsSuccess)
+        {
+            return new OkObjectResult(dataset.Value.ToDataset());
+        }
+
+        return new BadRequestObjectResult(Error.NoData);
     }
 
     public MemoryStream GetInstanceStream(Image instance, string studyInstanceUID, string seriesInstanceUID)
@@ -80,8 +102,15 @@ public class DicomWebHandler : IDicomWebHandler
         throw new NotImplementedException();
     }
 
-    public List<Image> FindInstances(List<DicomField> dataset)
+    public Result<Image> FindInstance(List<DicomField> dataset)
     {
-        return DicomWebRepostiroy.FindInstances(dataset).Value;
+        var imageDataset = DicomWebRepostiroy.FindInstance(dataset);
+
+        if (imageDataset.IsSuccess)
+        {
+            return imageDataset.Value;
+        }
+
+        return Result.Failure<Image>(Error.NoData);
     }
 }

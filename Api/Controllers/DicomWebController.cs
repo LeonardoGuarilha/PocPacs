@@ -4,10 +4,11 @@ using Application.Handlers.QueryHandlers.Studies.OpenStudy;
 using Application.ModelBinders;
 using Domain.Dicom;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Core.Result;
 
 namespace Api.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/dicomweb")]
 [ApiController]
 public class DicomWebController : ControllerBase
 {
@@ -60,21 +61,26 @@ public class DicomWebController : ControllerBase
             new DicomField("SOPInstanceUID", SOPInstanceUID),
         };
 
-        var instances = DicomWebHandler.FindInstances(parameters);
+        var instance = DicomWebHandler.FindInstance(parameters);
 
-        var response = new MultipartResult("related");
-
-        var file = new StreamReader(instances.FirstOrDefault().FullFilename).BaseStream;
-
-        var content = new MultipartReturn.MultipartContent()
+        if (instance.IsSuccess)
         {
-            ContentType = MimeMediaTypes.Dicom,
-            FileName = instances.FirstOrDefault().FullFilename,
-            Stream = file,
-        };
+            var response = new MultipartResult("related");
 
-        response.Add(content);
+            var file = new StreamReader(instance.Value.FullFilename).BaseStream;
 
-        return response;
+            var content = new MultipartReturn.MultipartContent()
+            {
+                ContentType = MimeMediaTypes.Dicom,
+                FileName = instance.Value.FullFilename,
+                Stream = file,
+            };
+
+            response.Add(content);
+
+            return response;
+        }
+
+        return new BadRequestObjectResult(Error.NoData);
     }
 }
