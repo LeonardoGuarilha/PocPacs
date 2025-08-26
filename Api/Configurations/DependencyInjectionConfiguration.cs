@@ -1,3 +1,4 @@
+using Application.Handlers.QueryHandlers.DicomWeb;
 using Application.Handlers.QueryHandlers.Studies.ListStudies;
 using Domain.Repositories.Read;
 using Infra.Repositories.Postgres.Read;
@@ -19,6 +20,7 @@ public static class DependencyInjectionConfiguration
     {
         services.AddTransient<IQidoRSRepository, QidoRSRepository>();
         services.AddTransient<IWadoRepository, WadoRepository>();
+        services.AddTransient<IDicomWebHandler, DicomWebHandler>();
 
         return services;
     }

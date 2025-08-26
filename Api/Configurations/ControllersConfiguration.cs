@@ -21,10 +21,10 @@ public static class ControllersConfiguration
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "PACS Admin",
-                    Description = "PACS Admin API Swagger surface",
-                    Contact = new OpenApiContact { Name = "Vivace Team", Email = "contato@mv.com.br", Url = new Uri("https://www.mv.com.br") },
-                    License = new OpenApiLicense { Name = "Proprietary", Url = new Uri("https://www.mv.com.br") }
+                    Title = "POCPACS",
+                    Description = "PocPacs API Swagger surface",
+                    Contact = new OpenApiContact { Name = "John Doe", Email = "contato@contato.com.br", Url = new Uri("https://www.google.com.br") },
+                    License = new OpenApiLicense { Name = "Proprietary", Url = new Uri("https://www.google.com.br") }
                 });
 
                 c.CustomSchemaIds(x => x.FullName);

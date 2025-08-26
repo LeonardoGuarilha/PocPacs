@@ -33,10 +33,10 @@ public class DicomWebHandler : IDicomWebHandler
 
     public IActionResult RetrieveSeries(List<DicomField> request, string studyInstanceUID)
     {
-        request.AddRange(new List<DicomField>
-        {
+        request.AddRange(
+        [
             new DicomField("StudyInstanceUID", studyInstanceUID),
-        });
+        ]);
 
         var dataset = DicomWebRepostiroy.FindSeries(request);//.Value.ToDataset();
 
